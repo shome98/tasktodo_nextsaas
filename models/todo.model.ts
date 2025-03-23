@@ -5,6 +5,7 @@ export interface ITodo extends Document {
     title: string;
     description: string;
     completed: boolean;
+    _id: string | Schema.Types.ObjectId;
 }
 const todoSchema = new Schema<ITodo>({
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },

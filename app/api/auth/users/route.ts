@@ -6,6 +6,9 @@ import User from "@/models/user.model";
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the user details." }, { status: 401 });
+        }
         const userId = session?.user.id;
         const userData = await User.findById(userId);
         if (!userData) {

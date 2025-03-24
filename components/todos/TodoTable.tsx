@@ -32,6 +32,10 @@ interface TodoTableProps {
 }
 
 export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps) {
+    const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
   return (
     <div className="border rounded-lg overflow-x-auto animate-in fade-in duration-700">
       <Table>
@@ -63,9 +67,9 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
               <TableCell
                 className={cn(todo.completed && "line-through text-muted-foreground")}
               >
-                {todo.title}
+                {truncateText(todo.title, 20)}
               </TableCell>
-              <TableCell>{todo.description}</TableCell>
+              <TableCell>{truncateText(todo.description, 20)}</TableCell>
               <TableCell className="hidden md:table-cell">
                 {format(new Date(todo.createdAt), "PPp")}
               </TableCell>

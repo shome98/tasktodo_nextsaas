@@ -8,6 +8,7 @@ export type Ttodo={
     _id:string;
     title?:string;
     description?:string;
+    completed:boolean;
     createdAt?:Date;
     updatedAt?:Date;
     userId?:string;
@@ -88,6 +89,34 @@ export async function DELETE(request:NextRequest,props: { params: Promise<{ id: 
         console.error("❌ Error deleting the todo:", error);
         return NextResponse.json(
           { error: "⚠️ Oops! Failed to delete the todo. Please try again." },
+          { status: 500 }
+        );
+    }
+}
+
+//toggle complete using patch
+export async function PATCH(request:NextRequest,props: { params: Promise<{ id: string }> }){
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the todo." }, { status: 401 });
+        }
+        const userId = session?.user.id;
+        const {id}=await props.params;
+        if(!id){
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+        }
+        const {completed}:ITodo=await request.json();
+        await connectToDatabase();
+        const todo=await Todo.findOneAndUpdate({_id:id,userId:userId},{completed:completed}).lean();
+        if(!todo){
+            return NextResponse.json({error:"🚫Could not update the todo. Please try again",},{status:401});
+        }
+        NextResponse.json({message:"😊Successfully updated the todo.",todo:todo},{status:201});
+    } catch (error) {
+        console.error("❌ Error updating the todo:", error);
+        return NextResponse.json(
+          { error: "⚠️ Oops! Failed to update the todo. Please try again." },
           { status: 500 }
         );
     }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Nunito_Sans } from "next/font/google";
 import "./globals.css";
+import AuthProvider from "@/components/AuthProvider";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -25,12 +26,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <AuthProvider>
     <html lang="en" className="dark">
       <body
         className={`${montserrat.variable} ${nunitoSans.variable} antialiased`}
       >
         {children}
       </body>
-    </html>
+      </html>
+      </AuthProvider>
   );
 }

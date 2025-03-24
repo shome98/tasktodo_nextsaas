@@ -6,9 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-//import { useToast } from "@/components/ui/use-toast";
-
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface TodoModalFormProps {
   onSubmit: (data: { title: string; description: string }) => void;
@@ -25,7 +24,7 @@ export function TodoModalForm({
   isOpen,
   setIsOpen,
 }: TodoModalFormProps) {
-  //const { toast } = useToast();
+
   const isUpdate = !!initialData;
   const form = useForm({
     defaultValues: initialData || {
@@ -45,8 +44,10 @@ export function TodoModalForm({
   const handleSubmit = (data: { title: string; description: string }) => {
     onSubmit(data);
     form.reset({ title: "", description: "" });
-    setIsOpen(false); // Close modal after submission
-    //toast({title: isUpdate ? "Task Updated" : "Task Created",description: "Your task has been successfully saved!",});
+    setIsOpen(false); 
+      toast.success(isUpdate ? "✅Task Updated" : "✅Task Created", {
+      description: "😊Your task has been successfully saved!",
+    });
   };
 
   const handleCancel = () => {

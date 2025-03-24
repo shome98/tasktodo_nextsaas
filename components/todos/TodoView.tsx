@@ -3,8 +3,9 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 //import { useToast } from "@/components/ui/use-toast";
-import TodoForm  from "./TodoForm";
+//import TodoForm  from "./TodoForm";
 import TodoCard from "./TodoCard";
+import { TodoModalForm } from "./TodoModalForm";
 
 interface Todo {
   _id: string;
@@ -19,7 +20,8 @@ export default function Home() {
   const router = useRouter();
   //const { toast } = useToast();
   const [todos, setTodos] = React.useState<Todo[]>([]);
-  const [editingTodo, setEditingTodo] = React.useState<Todo | null>(null);
+    const [editingTodo, setEditingTodo] = React.useState<Todo | null>(null);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -71,7 +73,12 @@ export default function Home() {
     return <div className="text-center mt-20">Loading...</div>;
     }
     const handleCancelEdit = () => {
-    setEditingTodo(null);
+        setEditingTodo(null);
+        setIsModalOpen(false);
+    };
+    const handleEdit = (todo: Todo) => {
+    setEditingTodo(todo);
+    setIsModalOpen(true); // Open the modal when editing
   };
 
   return (
@@ -80,10 +87,17 @@ export default function Home() {
         Track Your Tasks
       </h1>
       <div className="mb-12">
-        <TodoForm
+        {/* <TodoForm
           onSubmit={handleCreateOrUpdate}
           initialData={editingTodo ? { title: editingTodo.title, description: editingTodo.description } : undefined}
           onCancel={editingTodo ? handleCancelEdit : undefined}
+        /> */}
+              <TodoModalForm
+          onSubmit={handleCreateOrUpdate}
+          initialData={editingTodo ? { title: editingTodo.title, description: editingTodo.description } : undefined}
+          onCancel={handleCancelEdit}
+          isOpen={isModalOpen}
+          setIsOpen={setIsModalOpen}
         />
       </div>
       <div className="space-y-4">
@@ -96,7 +110,7 @@ export default function Home() {
             completed={todo.completed}
             onToggle={handleToggle}
             onDelete={handleDelete}
-            onEdit={() => setEditingTodo(todo)}
+            onEdit={() => handleEdit(todo)}
           />
         ))}
         {todos.length === 0 && (

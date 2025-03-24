@@ -109,7 +109,6 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                 className="w-80 md:w-96 max-w-[90vw] p-4 bg-background border rounded-lg shadow-lg"
                 align="center"
                 sideOffset={10}
-                style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
               >
                 <div className="space-y-2">
                   <h3 className="text-lg font-semibold">{todo.title}</h3>
@@ -117,7 +116,12 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                     <strong>Description:</strong> {todo.description}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Completed:</strong> {todo.completed ? "Yes" : "No"}
+                              <strong>Completed:</strong> {todo.completed ? "Yes" : "No"}
+                              <Checkbox
+                      checked={todo.completed}
+                                  onCheckedChange={() => onToggle(todo._id, !todo.completed)}
+                                  className="ml-2"
+                    />
                   </p>
                   <p className="text-sm text-muted-foreground">
                     <strong>Created:</strong> {format(new Date(todo.createdAt), "PPp")}

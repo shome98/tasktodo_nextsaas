@@ -66,3 +66,29 @@ export async function PUT(request:NextRequest,props: { params: Promise<{ id: str
         );
     }
 }
+
+export async function DELETE(request:NextRequest,props: { params: Promise<{ id: string }> }){
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the todo." }, { status: 401 });
+        }
+        const userId = session?.user.id;
+        const {id}=await props.params;
+        if(!id){
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+        }
+        await connectToDatabase();
+        const deletedTodo=await Todo.findOneAndDelete({_id:id,userId:userId}).lean();
+        if(!deletedTodo){
+            return NextResponse.json({error:"🚫Could not retrive the todo. Please try again",},{status:401});
+        }
+        NextResponse.json({message:"😊Successfully deleted the todo.",todo:deletedTodo},{status:201});
+    } catch (error) {
+        console.error("❌ Error deleting the todo:", error);
+        return NextResponse.json(
+          { error: "⚠️ Oops! Failed to delete the todo. Please try again." },
+          { status: 500 }
+        );
+    }
+}

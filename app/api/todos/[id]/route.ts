@@ -30,7 +30,7 @@ export async function GET(request:NextRequest,props: { params: Promise<{ id: str
         if(!todo){
             return NextResponse.json({error:"🚫Could not retrive the todo. Please try again",},{status:401});
         }
-        NextResponse.json({message:"😊Successfully retrived the todo.",todo:todo},{status:201});
+        return NextResponse.json({message:"😊Successfully retrived the todo.",todo:todo},{status:201});
     } catch (error) {
         console.error("❌ Error retrieving the todo:", error);
         return NextResponse.json(
@@ -58,7 +58,7 @@ export async function PUT(request:NextRequest,props: { params: Promise<{ id: str
         if(!updatedTodo){
             return NextResponse.json({error:"🚫Could not update the todo. Please try again",},{status:401});
         }
-        NextResponse.json({message:"😊Successfully updated the todo.",todo:updatedTodo},{status:201});
+        return NextResponse.json({message:"😊Successfully updated the todo.",todo:updatedTodo},{status:201});
     } catch (error) {
         console.error("❌ Error updating the todo:", error);
         return NextResponse.json(
@@ -84,7 +84,7 @@ export async function DELETE(request:NextRequest,props: { params: Promise<{ id: 
         if(!deletedTodo){
             return NextResponse.json({error:"🚫Could not retrive the todo. Please try again",},{status:401});
         }
-        NextResponse.json({message:"😊Successfully deleted the todo.",todo:deletedTodo},{status:201});
+        return NextResponse.json({message:"😊Successfully deleted the todo.",todo:deletedTodo},{status:201});
     } catch (error) {
         console.error("❌ Error deleting the todo:", error);
         return NextResponse.json(
@@ -112,7 +112,7 @@ export async function PATCH(request:NextRequest,props: { params: Promise<{ id: s
         if(!todo){
             return NextResponse.json({error:"🚫Could not update the todo. Please try again",},{status:401});
         }
-        NextResponse.json({message:"😊Successfully updated the todo.",todo:todo},{status:201});
+        return NextResponse.json({message:"😊Successfully updated the todo.",todo:todo},{status:201});
     } catch (error) {
         console.error("❌ Error updating the todo:", error);
         return NextResponse.json(

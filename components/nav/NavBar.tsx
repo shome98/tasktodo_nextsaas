@@ -50,7 +50,7 @@ export function NavBar() {
                 Login
               </Button>
               <Button
-                onClick={() => router.push("/signup")}
+                onClick={() => router.push("/register")}
                 className="transition-all duration-300 hover:scale-105"
               >
                 Sign Up

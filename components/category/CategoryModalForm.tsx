@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Category } from "@/types/types";
+import { Category } from "@/types/requiredtypes";
 
 interface CategoryModalFormProps {
   onSubmit: (data: { names: string[] }) => Promise<void>;

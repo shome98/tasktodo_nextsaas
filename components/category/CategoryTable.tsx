@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
-import { Category } from "@/types/types";
+import { Category } from "@/types/requiredtypes";
 
 interface CategoryTableProps {
   categories: Category[];

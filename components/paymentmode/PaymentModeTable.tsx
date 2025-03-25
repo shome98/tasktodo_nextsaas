@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
-import { PaymentMode } from "@/types/types";
+import { PaymentMode } from "@/types/requiredtypes";
 
 interface PaymentModeTableProps {
   paymentModes: PaymentMode[];

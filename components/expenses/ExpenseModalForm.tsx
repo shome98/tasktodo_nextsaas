@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Category, PaymentMode } from "@/types/types";
+import { Category, PaymentMode } from "@/types/requiredtypes";
 
 interface ExpenseModalFormProps {
   onSubmit: (data: {

@@ -5,7 +5,7 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Expense, Category, PaymentMode, ExpenseSummary as ExpenseSummaryType } from "@/types/types";
+import { Expense, Category, PaymentMode, ExpenseSummary as ExpenseSummaryType } from "@/types/requiredtypes";
 import { Todo, TodoTable } from "./todos/TodoTable";
 import { TodoModalForm } from "./todos/TodoModalForm";
 import { TodoFilters } from "./todos/TodoFilters";

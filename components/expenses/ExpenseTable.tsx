@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
-import { Expense } from "@/types/types";
+import { Expense } from "@/types/requiredtypes";
 
 interface ExpenseTableProps {
   expenses: Expense[];

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, Edit, Plus } from "lucide-react";
-import { ExpenseSummary as ExpenseSummaryType } from "@/types/types";
+import { ExpenseSummary as ExpenseSummaryType } from "@/types/requiredtypes";
 import { toast } from "sonner";
 
 interface ExpenseSummaryProps {

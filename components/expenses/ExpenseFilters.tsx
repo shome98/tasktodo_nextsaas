@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Category } from "@/types/types";
+import { Category } from "@/types/requiredtypes";
 
 interface ExpenseFiltersProps {
   categoryFilter: string;

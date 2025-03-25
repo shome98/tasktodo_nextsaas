@@ -13,8 +13,10 @@ export interface IPaymentMode extends Document{
     updatedAt?:Date;
 }
 
+export const defaultPaymentModes=["Credit Card","Debit Card","Online","Cash","UPI","Bank Transfer"];
+
 const paymentModeSchema=new Schema<IPaymentMode>({
-    names:{type:[String],required:true},
+    names:{type:[String],required:true,default:defaultPaymentModes},
     userId:{type:Schema.Types.ObjectId,ref:"User",required:true}
 },{timestamps:true});
 

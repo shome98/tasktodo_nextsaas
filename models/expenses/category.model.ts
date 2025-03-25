@@ -19,8 +19,10 @@ export interface ICategory extends Document{
     updatedAt?:Date;
 }
 
+export const defaultCategories=["Food","Transport","Groceries","Utitlies","Entertainment","Health","Recharge","Others"]
+
 const categorySchema=new Schema<ICategory>({
-    names:{type:[String],required:true},
+    names:{type:[String],required:true,default:defaultCategories},
     userId:{type:Schema.Types.ObjectId,ref:"User",required:true}
 },{timestamps:true});
 

@@ -31,7 +31,7 @@ export async function GET(request:NextRequest,props: { params: Promise<{ id: str
     }
 }
 
-export async function PUT(request:NextRequest,props: { params: Promise<{ id: string }> }){
+/*export async function PUT(request:NextRequest,props: { params: Promise<{ id: string }> }){
     try {
         const session = await getServerSession(authOptions);
                 if (!session) {
@@ -65,6 +65,51 @@ export async function PUT(request:NextRequest,props: { params: Promise<{ id: str
               { error: "⚠️ Oops! Failed to update the categories. Please try again." },
               { status: 500 }
             );
+    }
+}*/
+
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session) {
+            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to update categories." }, { status: 401 });
+        }
+
+        const userId = session?.user.id;
+        const { id } = await props.params;
+        if (!id) {
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+        }
+
+        const body: ICategory = await request.json();
+        if (body.names.length === 0) {
+            return NextResponse.json({ error: "😠 Please enter at least one category to update" }, { status: 401 });
+        }
+
+        await connectToDatabase();
+
+        const category = await Category.findOne({ _id: id, userId: userId });
+        if (!category) {
+            return NextResponse.json({ error: "🚫 Category not found or you may not have permission." }, { status: 404 });
+        }
+
+        // Add new names to the existing names array
+        body.names.forEach(newName => {
+            if (!category.names.includes(newName)) {
+                category.names.push(newName);
+            }
+        });
+
+        await category.save();
+
+        return NextResponse.json({ message: "✅ Successfully updated the categories.", categories: category }, { status: 200 });
+
+    } catch (error) {
+        console.error("❌ Error updating the categories:", error);
+        return NextResponse.json(
+            { error: "⚠️ Oops! Failed to update the categories. Please try again." },
+            { status: 500 }
+        );
     }
 }
 

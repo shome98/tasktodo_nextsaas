@@ -20,7 +20,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-interface Todo {
+export interface Todo {
   _id: string;
   title: string;
   description: string;

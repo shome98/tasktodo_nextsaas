@@ -29,7 +29,7 @@ import { IPaymentMode } from "@/models/expenses/paymentmode.model";
   const expenseSchema = new Schema<IExpense>({
       amount: { type: Number, required: true },
       description: { type: String, required: true },
-      category: { type: Schema.Types.ObjectId, ref: "Category", required: true,default:"others"},
+      category: { type: Schema.Types.ObjectId, ref: "Category", required: true},
       paymentMode: { type: Schema.Types.ObjectId, ref: "PaymentMode", required: true },
       type: { type: String, enum: ["credit", "debit"], required: true },
       status: { type: String, enum: ["due", "paid", "refunded"], required: true,default:"paid" },

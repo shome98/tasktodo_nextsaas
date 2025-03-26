@@ -1,22 +1,9 @@
 "use client";
-
 import * as React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Category, PaymentMode } from "@/types/requiredtypes";
 
@@ -70,6 +57,10 @@ export function ExpenseModalForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.category || !formData.paymentMode) {
+      alert("Please select a category and payment mode.");
+      return;
+    }
     await onSubmit({ ...formData, amount: Number(formData.amount) });
     setIsOpen(false);
     setFormData({
@@ -122,13 +113,11 @@ export function ExpenseModalForm({
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.flatMap((cat) =>
-                  cat.names.map((name:string) => (
-                    <SelectItem key={name} value={name}>
-                      {name}
-                    </SelectItem>
-                  ))
-                )}
+                {categories.map((cat) => (
+                  <SelectItem key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -142,13 +131,11 @@ export function ExpenseModalForm({
                 <SelectValue placeholder="Select payment mode" />
               </SelectTrigger>
               <SelectContent>
-                {paymentModes.flatMap((pm) =>
-                  pm.names.map((name) => (
-                    <SelectItem key={name} value={name}>
-                      {name}
-                    </SelectItem>
-                  ))
-                )}
+                {paymentModes.map((pm) => (
+                  <SelectItem key={pm._id} value={pm._id}>
+                    {pm.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

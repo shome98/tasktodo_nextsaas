@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import Expense from "@/models/expenses/expense.model";
 import ExpenseSummary from "@/models/expenses/expensesummary.model";
 import { connectToDatabase } from "@/db/connectToDatabase";

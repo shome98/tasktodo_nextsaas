@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to add payment modes." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const body: { name: string } = await request.json();
+        const body: IPaymentMode = await request.json();
         if (!body.name) {
             return NextResponse.json({ error: "😠 Please enter a payment mode name" }, { status: 400 });
         }

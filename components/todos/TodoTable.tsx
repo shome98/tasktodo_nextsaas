@@ -69,6 +69,7 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                     <Checkbox
                       checked={todo.completed}
                       onCheckedChange={() => onToggle(todo._id, !todo.completed)}
+                      onClick={e=>e.stopPropagation()}
                     />
                   </TableCell>
                   <TableCell

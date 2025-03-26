@@ -1,25 +1,46 @@
 "use client";
 
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
-import { Expense } from "@/types/requiredtypes";
+import { Expense, Category, PaymentMode } from "@/types/requiredtypes";
 
 interface ExpenseTableProps {
   expenses: Expense[];
   onDelete: (id: string) => void;
   onEdit: (expense: Expense) => void;
+  categories: Category[];
+  paymentModes: PaymentMode[];
 }
 
-export function ExpenseTable({ expenses, onDelete, onEdit }: ExpenseTableProps) {
+export function ExpenseTable({
+  expenses,
+  onDelete,
+  onEdit,
+  categories,
+  paymentModes,
+}: ExpenseTableProps) {
+  const getCategoryName = (expense: Expense) => {
+    // If category is populated with a name, use it
+    if (expense.category && typeof expense.category !== "string" && "name" in expense.category) {
+      return (expense.category as { name: string }).name;
+    }
+    // Fallback to lookup in categories array
+    const category = categories.find((cat) => cat._id === expense.category);
+    return category ? category.name : "Unknown";
+  };
+
+  const getPaymentModeName = (expense: Expense) => {
+    // If paymentMode is populated with a name, use it
+    if (expense.paymentMode && typeof expense.paymentMode !== "string" && "name" in expense.paymentMode) {
+      return (expense.paymentMode as { name: string }).name;
+    }
+    // Fallback to lookup in paymentModes array
+    const paymentMode = paymentModes.find((pm) => pm._id === expense.paymentMode);
+    return paymentMode ? paymentMode.name : "Unknown";
+  };
+
   return (
     <div className="border rounded-md animate-in fade-in duration-700">
       <Table>
@@ -41,8 +62,8 @@ export function ExpenseTable({ expenses, onDelete, onEdit }: ExpenseTableProps) 
               <TableRow key={expense._id}>
                 <TableCell>{expense.description}</TableCell>
                 <TableCell>${expense.amount.toFixed(2)}</TableCell>
-                <TableCell>{expense.category}</TableCell>
-                <TableCell>{expense.paymentMode}</TableCell>
+                <TableCell>{(typeof(expense.category)==="object"&&expense.category?.name)||getCategoryName(expense)}</TableCell>
+                <TableCell>{(typeof(expense.paymentMode)==="object"&&expense.paymentMode?.name)||getPaymentModeName(expense)}</TableCell>
                 <TableCell>{expense.type}</TableCell>
                 <TableCell>{expense.status}</TableCell>
                 <TableCell>{new Date(expense.createdAt).toLocaleDateString()}</TableCell>
@@ -61,7 +82,7 @@ export function ExpenseTable({ expenses, onDelete, onEdit }: ExpenseTableProps) 
           ) : (
             <TableRow>
               <TableCell colSpan={8} className="text-center text-muted-foreground">
-                No expenses found.
+                😵 No expenses found. Please add one to continue.
               </TableCell>
             </TableRow>
           )}

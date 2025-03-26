@@ -1,14 +1,6 @@
 "use client";
-
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
 import { PaymentMode } from "@/types/requiredtypes";
@@ -33,7 +25,7 @@ export function PaymentModeTable({ paymentModes, onEdit, onDelete }: PaymentMode
           {paymentModes.length > 0 ? (
             paymentModes.map((paymentMode) => (
               <TableRow key={paymentMode._id}>
-                <TableCell>{paymentMode.names.join(", ")}</TableCell>
+                <TableCell>{paymentMode.name}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => onEdit(paymentMode)}>
@@ -49,7 +41,7 @@ export function PaymentModeTable({ paymentModes, onEdit, onDelete }: PaymentMode
           ) : (
             <TableRow>
               <TableCell colSpan={2} className="text-center text-muted-foreground">
-                No payment modes found.
+                😵 No payment modes found. Please add one continue.
               </TableCell>
             </TableRow>
           )}

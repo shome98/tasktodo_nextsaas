@@ -1,20 +1,14 @@
 "use client";
 
 import * as React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaymentMode } from "@/types/requiredtypes";
 
 interface PaymentModeModalFormProps {
-  onSubmit: (data: { names: string[] }) => Promise<void>;
+  onSubmit: (data: { name: string }) => Promise<void>;
   initialData?: PaymentMode;
   onCancel: () => void;
   isOpen: boolean;
@@ -28,24 +22,21 @@ export function PaymentModeModalForm({
   isOpen,
   setIsOpen,
 }: PaymentModeModalFormProps) {
-  const [names, setNames] = React.useState<string>(initialData?.names.join(", ") || "");
+  const [name, setName] = React.useState(initialData?.name || "");
 
   React.useEffect(() => {
-    if (initialData) {
-      setNames(initialData.names.join(", "));
-    }
+    if (initialData) setName(initialData.name);
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const nameArray = names.split(",").map((name) => name.trim()).filter((name) => name);
-    if (nameArray.length === 0) {
-      alert("Please enter at least one payment mode name.");
+    if (!name.trim()) {
+      alert("Please enter a payment mode name.");
       return;
     }
-    await onSubmit({ names: nameArray });
+    await onSubmit({ name: name.trim() });
     setIsOpen(false);
-    setNames("");
+    setName("");
   };
 
   return (
@@ -59,12 +50,12 @@ export function PaymentModeModalForm({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="names">Payment Mode Names (comma-separated)</Label>
+            <Label htmlFor="name">Payment Mode Name</Label>
             <Input
-              id="names"
-              value={names}
-              onChange={(e) => setNames(e.target.value)}
-              placeholder="e.g., Cash, Credit Card"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Cash"
               required
             />
           </div>

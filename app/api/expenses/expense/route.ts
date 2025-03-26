@@ -12,11 +12,11 @@ export async function GET() {
         }
         const userId = session?.user.id;
         await connectToDatabase();
-        const expenses = await Expense.find({ userId: userId }).lean();
+        const expenses = await Expense.find({ userId }).populate('category').populate('paymentMode').lean();
         if (!expenses) {
-            return NextResponse.json({ error: "🚫 Failed to retrieve expenses." }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Failed to retrieve expenses." }, { status: 404 });
         }
-        return NextResponse.json({ message: "✅ Successfully fetched the expenses.", expenses: expenses }, { status: 201 });
+        return NextResponse.json({ message: "✅ Successfully fetched the expenses.", expenses }, { status: 200 });
 
     } catch (error) {
         console.error("❌ Error retrieving the expenses:", error);
@@ -37,14 +37,11 @@ export async function POST(request: NextRequest) {
         const userId = session?.user.id;
         const body = await request.json();
         if (!body.amount || !body.description || !body.category || !body.paymentMode || !body.type || !body.status) {
-            return NextResponse.json({ error: "😠 Please provide all required fields." }, { status: 401 });
+            return NextResponse.json({ error: "😠 Please provide all required fields." }, { status: 400 });
         }
 
         await connectToDatabase();
-        const newExpense = await Expense.create({ ...body, userId: userId });
-        if (!newExpense) {
-            return NextResponse.json({ error: "🚫 Failed to add the expense." }, { status: 401 });
-        }
+        const newExpense = await Expense.create({ ...body, userId });
         return NextResponse.json({ message: "✅ Successfully added the new expense.", expense: newExpense }, { status: 201 });
 
     } catch (error) {

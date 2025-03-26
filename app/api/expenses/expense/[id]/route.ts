@@ -4,7 +4,7 @@ import Expense from "@/models/expenses/expense.model";
 import { connectToDatabase } from "@/db/connectToDatabase";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
-export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
@@ -12,17 +12,17 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
         }
 
         const userId = session?.user.id;
-        const { id } = await props.params;
+        const { id } = params;
         if (!id) {
-            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
 
         await connectToDatabase();
-        const expense = await Expense.findOne({ userId: userId, _id: id }).lean();
+        const expense = await Expense.findOne({ userId, _id: id }).populate('category').populate('paymentMode').lean();
         if (!expense) {
             return NextResponse.json({ error: "🚫 Failed to retrieve the expense." }, { status: 404 });
         }
-        return NextResponse.json({ message: "✅ Successfully fetched the expense.", expense: expense }, { status: 200 });
+        return NextResponse.json({ message: "✅ Successfully fetched the expense.", expense }, { status: 200 });
 
     } catch (error) {
         console.error("❌ Error retrieving the expense:", error);
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, props: { params: Promise<{ id: s
     }
 }
 
-export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
@@ -41,23 +41,23 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
         }
 
         const userId = session?.user.id;
-        const { id } = await props.params;
+        const { id } = params;
         if (!id) {
-            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
 
         const body = await request.json();
         if (!body.amount || !body.description || !body.category || !body.paymentMode || !body.type || !body.status) {
-            return NextResponse.json({ error: "😠 Please provide all required fields." }, { status: 401 });
+            return NextResponse.json({ error: "😠 Please provide all required fields." }, { status: 400 });
         }
 
         await connectToDatabase();
 
         const updatedExpense = await Expense.findOneAndUpdate(
-            { _id: id, userId: userId },
+            { _id: id, userId },
             { ...body },
-            { new: true }
-        );
+            { new: true, runValidators: true }
+        ).populate('category').populate('paymentMode');
         if (!updatedExpense) {
             return NextResponse.json({ error: "🚫 Failed to update the expense." }, { status: 404 });
         }
@@ -73,7 +73,7 @@ export async function PUT(request: NextRequest, props: { params: Promise<{ id: s
     }
 }
 
-export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
@@ -81,14 +81,14 @@ export async function DELETE(request: NextRequest, props: { params: Promise<{ id
         }
 
         const userId = session?.user.id;
-        const { id } = await props.params;
+        const { id } = params;
         if (!id) {
-            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
 
         await connectToDatabase();
 
-        const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId: userId });
+        const deletedExpense = await Expense.findOneAndDelete({ _id: id, userId });
         if (!deletedExpense) {
             return NextResponse.json({ error: "🚫 Failed to delete the expense." }, { status: 404 });
         }

@@ -1,38 +1,41 @@
-export interface Expense {
-  _id: string;
-  amount: number;
-  description: string;
-  category: string; // Now a string from Category.names
-  paymentMode: string; // Now a string from PaymentMode.names
-  type: "credit" | "debit";
-  status: "due" | "paid" | "refunded";
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface Category {
   _id: string;
-  names: string[];
+  name: string;
   userId: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PaymentMode {
   _id: string;
-  names: string[];
+  name: string;
+  userId: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Expense {
+  _id: string;
+  description: string;
+  amount: number;
+  category: Category | string; // _id reference to Category
+  paymentMode: PaymentMode|string; // _id reference to PaymentMode
+  type: "credit" | "debit";
+  status: "due" | "paid" | "refunded";
   userId: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export interface ExpenseSummary {
-  category: string;
-  paymentMode: string;
+  categoryId: string;
+  categoryName: string;
+  paymentModeId: string;
+  paymentModeName: string;
   type: "credit" | "debit";
   status: "due" | "paid" | "refunded";
+  totalAmount: number;
   month: number;
   year: number;
-  totalAmount: number;
+  count: number;
 }

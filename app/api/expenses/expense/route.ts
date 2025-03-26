@@ -12,7 +12,7 @@ export async function GET() {
         }
         const userId = session?.user.id;
         await connectToDatabase();
-        const expenses = await Expense.find({ userId }).populate('category').populate('paymentMode').lean();
+        const expenses = await Expense.find({ userId }).populate('category','name').populate('paymentMode','name').lean();
         if (!expenses) {
             return NextResponse.json({ error: "🚫 Failed to retrieve expenses." }, { status: 404 });
         }

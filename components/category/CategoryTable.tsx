@@ -1,14 +1,6 @@
 "use client";
-
 import * as React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
 import { Category } from "@/types/requiredtypes";
@@ -33,7 +25,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
           {categories.length > 0 ? (
             categories.map((category) => (
               <TableRow key={category._id}>
-                <TableCell>{category.names.join(", ")}</TableCell>
+                <TableCell>{category.name}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => onEdit(category)}>
@@ -49,7 +41,7 @@ export function CategoryTable({ categories, onEdit, onDelete }: CategoryTablePro
           ) : (
             <TableRow>
               <TableCell colSpan={2} className="text-center text-muted-foreground">
-                No categories found.
+                😵 No categories found. Please add on to continue.
               </TableCell>
             </TableRow>
           )}

@@ -1,20 +1,13 @@
 "use client";
-
 import * as React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Category } from "@/types/requiredtypes";
 
 interface CategoryModalFormProps {
-  onSubmit: (data: { names: string[] }) => Promise<void>;
+  onSubmit: (data: { name: string }) => Promise<void>;
   initialData?: Category;
   onCancel: () => void;
   isOpen: boolean;
@@ -28,24 +21,21 @@ export function CategoryModalForm({
   isOpen,
   setIsOpen,
 }: CategoryModalFormProps) {
-  const [names, setNames] = React.useState<string>(initialData?.names.join(", ") || "");
+  const [name, setName] = React.useState(initialData?.name || "");
 
   React.useEffect(() => {
-    if (initialData) {
-      setNames(initialData.names.join(", "));
-    }
+    if (initialData) setName(initialData.name);
   }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const nameArray = names.split(",").map((name) => name.trim()).filter((name) => name);
-    if (nameArray.length === 0) {
-      alert("Please enter at least one category name.");
+    if (!name.trim()) {
+      alert("Please enter a category name.");
       return;
     }
-    await onSubmit({ names: nameArray });
+    await onSubmit({ name: name.trim() });
     setIsOpen(false);
-    setNames("");
+    setName("");
   };
 
   return (
@@ -59,12 +49,12 @@ export function CategoryModalForm({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="names">Category Names (comma-separated)</Label>
+            <Label htmlFor="name">Category Name</Label>
             <Input
-              id="names"
-              value={names}
-              onChange={(e) => setNames(e.target.value)}
-              placeholder="e.g., Food, Travel"
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Bus"
               required
             />
           </div>

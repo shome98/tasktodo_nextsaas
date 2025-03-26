@@ -1,22 +1,9 @@
 "use client";
-
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Trash2, Edit, Plus } from "lucide-react";
 import { ExpenseSummary as ExpenseSummaryType } from "@/types/requiredtypes";
 import { toast } from "sonner";
@@ -76,7 +63,7 @@ export function ExpenseSummary({ summaries, categories, paymentModes }: ExpenseS
     const categoryTotals = summaries
       .filter((s) => s.year === currentYear)
       .reduce((acc: { [key: string]: number }, s) => {
-        acc[s.category] = (acc[s.category] || 0) + s.totalAmount;
+        acc[s.categoryId] = (acc[s.categoryId] || 0) + s.totalAmount;
         return acc;
       }, {});
     const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0]?.[0] || categories[0] || "N/A";
@@ -101,8 +88,8 @@ export function ExpenseSummary({ summaries, categories, paymentModes }: ExpenseS
         return (
           (!filters.month || s.month === filters.month) &&
           (!filters.year || s.year === filters.year) &&
-          (!filters.category || s.category === filters.category) &&
-          (!filters.paymentMode || s.paymentMode === filters.paymentMode)
+          (!filters.category || s.categoryId === filters.category) &&
+          (!filters.paymentMode || s.paymentModeId === filters.paymentMode)
         );
       })
       .reduce((sum, s) => sum + s.totalAmount, 0);

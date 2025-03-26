@@ -1,17 +1,17 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import Category, { ICategory } from "@/models/expenses/category.model";
+import Category from "@/models/expenses/category.model";
 import { connectToDatabase } from "@/db/connectToDatabase";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
-            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the categories." }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the category." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
@@ -39,7 +39,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         }
 
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
@@ -71,14 +71,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to delete categories." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }

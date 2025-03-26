@@ -1,17 +1,17 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import PaymentMode, { IPaymentMode } from "@/models/expenses/paymentmode.model";
+import PaymentMode from "@/models/expenses/paymentmode.model";
 import { connectToDatabase } from "@/db/connectToDatabase";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to retrieve the payment mode." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
@@ -31,21 +31,24 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to update payment modes." }, { status: 401 });
         }
+
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }
+
         const body: { name: string } = await request.json();
         if (!body.name) {
             return NextResponse.json({ error: "😠 Please enter a payment mode name to update" }, { status: 400 });
         }
+
         await connectToDatabase();
 
         const paymentMode = await PaymentMode.findOneAndUpdate(
@@ -68,14 +71,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {
         const session = await getServerSession(authOptions);
         if (!session) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to delete payment modes." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const { id } = params;
+        const { id } = await props.params;
         if (!id) {
             return NextResponse.json({ error: "🚫 Not a valid param!" }, { status: 400 });
         }

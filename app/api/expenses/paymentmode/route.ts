@@ -12,11 +12,11 @@ export async function GET() {
         }
         const userId = session?.user.id;
         await connectToDatabase();
-        const paymentModes = await PaymentMode.find({ userId: userId }).lean();
+        const paymentModes = await PaymentMode.find({ userId }).lean();
         if (!paymentModes) {
-            return NextResponse.json({ error: "🚫 Failed to retrieve the payment modes." }, { status: 401 });
+            return NextResponse.json({ error: "🚫 Failed to retrieve the payment modes." }, { status: 404 });
         }
-        return NextResponse.json({ message: "✅ Successfully fetched the payment modes.", paymentModes: paymentModes }, { status: 201 });
+        return NextResponse.json({ message: "✅ Successfully fetched the payment modes.", paymentModes }, { status: 200 });
 
     } catch (error) {
         console.error("❌ Error retrieving the payment modes:", error);
@@ -34,21 +34,18 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "🚫 Unauthorized. Please log in to add payment modes." }, { status: 401 });
         }
         const userId = session?.user.id;
-        const body: IPaymentMode = await request.json();
-        if (body.names.length === 0) {
-            return NextResponse.json({ error: "😠 Please enter at least one payment mode" }, { status: 401 });
+        const body: { name: string } = await request.json();
+        if (!body.name) {
+            return NextResponse.json({ error: "😠 Please enter a payment mode name" }, { status: 400 });
         }
         await connectToDatabase();
-        const newPaymentModes = await PaymentMode.create({ names: body.names, userId: userId });
-        if (!newPaymentModes) {
-            return NextResponse.json({ error: "🚫 Failed to add the payment modes." }, { status: 401 });
-        }
-        return NextResponse.json({ message: "✅ Successfully added the new payment modes.", paymentModes: newPaymentModes }, { status: 201 });
+        const newPaymentMode = await PaymentMode.create({ name: body.name, userId });
+        return NextResponse.json({ message: "✅ Successfully added the new payment mode.", paymentMode: newPaymentMode }, { status: 201 });
 
     } catch (error) {
-        console.error("❌ Error adding the payment modes:", error);
+        console.error("❌ Error adding the payment mode:", error);
         return NextResponse.json(
-            { error: "⚠️ Oops! Failed to add the payment modes. Please try again." },
+            { error: "⚠️ Oops! Failed to add the payment mode. Please try again." },
             { status: 500 }
         );
     }

@@ -1,19 +1,6 @@
 import mongoose,{ Document, models, Schema } from "mongoose";
-
-// export interface ICategory extends Document{
-//     names:string;
-//     userId:string|Schema.Types.ObjectId;
-//     createdAt?:Date;
-//     updatedAt?:Date;
-// }
-
-// const categorySchema=new Schema<ICategory>({
-//     names:{type:String,required:true},
-//     userId:{type:Schema.Types.ObjectId,ref:"User",required:true}
-// },{timestamps:true});
-
 export interface ICategory extends Document{
-    names:string[];
+    name:string;
     userId:string|Schema.Types.ObjectId;
     createdAt?:Date;
     updatedAt?:Date;
@@ -22,7 +9,7 @@ export interface ICategory extends Document{
 export const defaultCategories=["Food","Transport","Groceries","Utitlies","Entertainment","Health","Recharge","Others"]
 
 const categorySchema=new Schema<ICategory>({
-    names:{type:[String],required:true,default:defaultCategories},
+    name:{type:String,required:true},
     userId:{type:Schema.Types.ObjectId,ref:"User",required:true}
 },{timestamps:true});
 
@@ -31,7 +18,10 @@ function capitalizeFirstLetter(str:string) {
 }
 
 categorySchema.pre('save', function(next) {
-    this.names = this.names.map(name => capitalizeFirstLetter(name));
+    //this.names = this.names.map(name => capitalizeFirstLetter(name));
+    if(this.isModified("name")){
+        this.name=capitalizeFirstLetter(this.name);
+    }
     next();
 });
 

@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import {  NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Expense from "@/models/expenses/expense.model";
 import ExpenseSummary from "@/models/expenses/expensesummary.model";
 import { connectToDatabase } from "@/db/connectToDatabase";
@@ -49,13 +49,14 @@ export async function GET() {
         if (!expenseSummary) {
             return NextResponse.json({ error: "🚫 Failed to retrieve the expense summary." }, { status: 404 });
         }
+
         // Save the aggregated data to the ExpenseSummary collection
         await ExpenseSummary.insertMany(expenseSummary.map(summary => ({
             ...summary,
             userId: userIdObjectId
         })));
 
-        return NextResponse.json({ message: "✅ Successfully fetched and stored the expense summary.", expenseSummary: expenseSummary }, { status: 200 });
+        return NextResponse.json({ message: "✅ Successfully fetched and stored the expense summary.", expenseSummary }, { status: 200 });
 
     } catch (error) {
         console.error("❌ Error retrieving the expense summary:", error);

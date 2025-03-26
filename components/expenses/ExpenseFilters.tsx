@@ -1,15 +1,9 @@
 "use client";
-
 import * as React from "react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Category } from "@/types/requiredtypes";
+import { Filter } from "lucide-react";
 
 interface ExpenseFiltersProps {
   categoryFilter: string;
@@ -38,65 +32,76 @@ export function ExpenseFilters({
   setSortOrder,
   categories,
 }: ExpenseFiltersProps) {
-  const flatCategories = categories.flatMap((cat) => cat.names);
-
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-4 animate-in fade-in duration-700">
-      <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Filter by category" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          {flatCategories.map((cat) => (
-            <SelectItem key={cat} value={cat}>
-              {cat}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select value={typeFilter} onValueChange={setTypeFilter}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Filter by type" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Types</SelectItem>
-          <SelectItem value="credit">Credit</SelectItem>
-          <SelectItem value="debit">Debit</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select value={statusFilter} onValueChange={setStatusFilter}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Filter by status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Statuses</SelectItem>
-          <SelectItem value="due">Due</SelectItem>
-          <SelectItem value="paid">Paid</SelectItem>
-          <SelectItem value="refunded">Refunded</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select value={sortBy} onValueChange={(value) => setSortBy(value as "createdAt" | "amount" | "description")}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Sort by" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="createdAt">Date</SelectItem>
-          <SelectItem value="amount">Amount</SelectItem>
-          <SelectItem value="description">Description</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Button
-        variant="outline"
-        onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-        className="w-full sm:w-auto"
-      >
-        {sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
-      </Button>
+    <div className="grid grid-cols-5 gap-3 md:grid-cols-5 mb-4">
+      <div>
+        <Label htmlFor="categoryFilter" className="mb-1"><Filter className="h-4 w-4 shrink-0" /> Category</Label>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger id="categoryFilter">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat._id} value={cat._id}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="typeFilter" className="mb-1"><Filter className="h-4 w-4 shrink-0" /> Type</Label>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger id="typeFilter">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="credit">Credit</SelectItem>
+            <SelectItem value="debit">Debit</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="statusFilter" className="mb-1"><Filter className="h-4 w-4 shrink-0" /> Status</Label>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger id="statusFilter">
+            <SelectValue placeholder="All" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="due">Due</SelectItem>
+            <SelectItem value="paid">Paid</SelectItem>
+            <SelectItem value="refunded">Refunded</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div >
+        <Label htmlFor="sortBy" className="mb-1">Sort By</Label>
+        <Select value={sortBy} onValueChange={(value) => setSortBy(value as "createdAt" | "amount" | "description")}>
+          <SelectTrigger id="sortBy">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="createdAt">Date</SelectItem>
+            <SelectItem value="amount">Amount</SelectItem>
+            <SelectItem value="description">Description</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="sortOrder" className="mb-1">Sort Order</Label>
+        <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "asc" | "desc")}>
+          <SelectTrigger id="sortOrder">
+            <SelectValue placeholder="Order" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="asc">Ascending</SelectItem>
+            <SelectItem value="desc">Descending</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

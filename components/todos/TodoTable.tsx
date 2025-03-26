@@ -108,6 +108,7 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
               <PopoverContent
                 className="w-80 md:w-96 max-w-[90vw] p-4 bg-background border rounded-lg shadow-lg"
                 align="center"
+                side="top"
                 sideOffset={10}
               >
                 <div className="space-y-2">

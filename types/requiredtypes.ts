@@ -48,3 +48,7 @@ export interface Todo {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface ApiError {
+  message: string;
+}

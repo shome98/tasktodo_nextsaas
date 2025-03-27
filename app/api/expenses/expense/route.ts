@@ -7,7 +7,7 @@ import { connectToDatabase } from "@/db/connectToDatabase";
 import PaymentMode from "@/models/expenses/paymentmode.model";
 import Category from "@/models/expenses/category.model";
 
-
+const ensuremodels=[Category,PaymentMode];
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);

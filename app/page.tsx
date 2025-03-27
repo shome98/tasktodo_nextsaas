@@ -1,7 +1,7 @@
 //import TodoView from "@/components/todos/TodoView";
-import TodoViewTable from "@/components/todos/TodoViewTable";
+// import TodoViewTable from "@/components/todos/TodoViewTable";
 
-import HomeViewTwo from "@/components/HomeViewTwo";
+// import HomeViewTwo from "@/components/HomeViewTwo";
 import TodoViewv1 from "@/components/views/TodoViewv1";
 import PaymentModeViewv1 from "@/components/views/PaymentModeViewv1";
 import CategoryViewv1 from "@/components/views/CategoryViewv1";

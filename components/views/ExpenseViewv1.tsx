@@ -1,148 +1,127 @@
 "use client";
-
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Expense, Category, PaymentMode,} from "@/types/requiredtypes";
+import { Expense, Category, PaymentMode } from "@/types/requiredtypes";
 import { ExpenseModalForm } from "../expenses/ExpenseModalForm";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
 import { ExpenseTable } from "../expenses/ExpenseTable";
 import Loading from "../Loading";
+import { fetchExpenses, createOrUpdateExpense, deleteExpense } from "@/lib/server/expense.actions";
+import { fetchCategories } from "@/lib/server/category.actions";
+import { fetchPaymentModes } from "@/lib/server/paymentmode.actions";
 
-export default function Expenseviewv1() {
-    const { status, data: session } = useSession();
-    const router = useRouter();
+export default function ExpenseViewv1() {
+  const { status, data: session } = useSession();
+  const router = useRouter();
 
-    const [expenses, setExpenses] = React.useState<Expense[]>([]);
-    const [editingExpense, setEditingExpense] = React.useState<Expense | null>(null);
-    const [isExpenseModalOpen, setIsExpenseModalOpen] = React.useState(false);
-    
-    const [expenseCategoryFilter, setExpenseCategoryFilter] = React.useState<string>("all");
-    const [expenseTypeFilter, setExpenseTypeFilter] = React.useState<string>("all");
-    const [expenseStatusFilter, setExpenseStatusFilter] = React.useState<string>("all");
-    const [expenseSortBy, setExpenseSortBy] = React.useState<"createdAt" | "amount" | "description">("createdAt");
-    const [expenseSortOrder, setExpenseSortOrder] = React.useState<"asc" | "desc">("desc");
+  const [expenses, setExpenses] = React.useState<Expense[]>([]);
+  const [editingExpense, setEditingExpense] = React.useState<Expense | null>(null);
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = React.useState(false);
+  const [expenseCategoryFilter, setExpenseCategoryFilter] = React.useState<string>("all");
+  const [expenseTypeFilter, setExpenseTypeFilter] = React.useState<string>("all");
+  const [expenseStatusFilter, setExpenseStatusFilter] = React.useState<string>("all");
+  const [expenseSortBy, setExpenseSortBy] = React.useState<"createdAt" | "amount" | "description">("createdAt");
+  const [expenseSortOrder, setExpenseSortOrder] = React.useState<"asc" | "desc">("desc");
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [paymentModes, setPaymentModes] = React.useState<PaymentMode[]>([]);
 
-    const [categories, setCategories] = React.useState<Category[]>([]);
-    const [paymentModes, setPaymentModes] = React.useState<PaymentMode[]>([]);
+  React.useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+    if (status === "authenticated" && session?.user?.id) {
+      Promise.all([
+        fetchExpenses().then(setExpenses),
+        fetchCategories().then(setCategories),
+        fetchPaymentModes().then(setPaymentModes),
+      ]).catch((error) => {
+        const message = error instanceof Error ? error.message : "Unknown error from expenses.";
+        toast.error("Error", { description: `😵 ${message}` });
+      });
+    }
+  }, [status, session, router]);
 
-    React.useEffect(() => {
-        if (status === "unauthenticated") {
-            router.push("/login");
-        }
-        if (status === "authenticated" && session?.user?.id) {
-            fetchExpenses();
-            fetchCategories();
-            fetchPaymentModes();
-        }
-    }, [status, session, router]);
+  const handleCreateOrUpdateExpense = async (data: {
+    description: string;
+    amount: number;
+    category: string;
+    paymentMode: string;
+    type: "credit" | "debit";
+    status: "due" | "paid" | "refunded";
+  }) => {
+    try {
+      await createOrUpdateExpense({ ...data, _id: editingExpense?._id });
+      const updatedExpenses = await fetchExpenses();
+      setExpenses(updatedExpenses);
+      setEditingExpense(null);
+      setIsExpenseModalOpen(false);
+      toast.success(editingExpense ? "😊 Expense Updated" : "😊 Expense Created", {
+        description: `The expense "${data.description}" has been ${editingExpense ? "updated" : "created"} successfully.`,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Error", { description: message });
+    }
+  };
 
-    const fetchExpenses = async () => {
-        const res = await fetch(`/api/expenses/expense?userId=${session?.user?.id}`);
-        const data = await res.json();
-        if (data.expenses) setExpenses(data.expenses);
-    };
+  const handleDeleteExpense = async (id: string) => {
+    try {
+      await deleteExpense(id);
+      const updatedExpenses = await fetchExpenses();
+      setExpenses(updatedExpenses);
+      toast.success("😊 Expense Deleted", { description: "😊 The expense has been successfully removed." });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Error", { description: message });
+    }
+  };
 
-    const fetchCategories = async () => {
-        const res = await fetch(`/api/expenses/category?userId=${session?.user?.id}`);
-        const data = await res.json();
-        if (data.categories) setCategories(data.categories);
-    };
+  const handleEditExpense = (expense: Expense) => {
+    setEditingExpense(expense);
+    setIsExpenseModalOpen(true);
+  };
 
-    const fetchPaymentModes = async () => {
-        const res = await fetch(`/api/expenses/paymentmode?userId=${session?.user?.id}`);
-        const data = await res.json();
-        if (data.paymentModes) setPaymentModes(data.paymentModes);
-    };
+  const handleCancelEditExpense = () => {
+    setEditingExpense(null);
+    setIsExpenseModalOpen(false);
+  };
 
-    const handleCreateOrUpdateExpense = async (data: {
-        description: string;
-        amount: number;
-        category: string;
-        paymentMode: string;
-        type: "credit" | "debit";
-        status: "due" | "paid" | "refunded";
-    }) => {
-        const method = editingExpense ? "PUT" : "POST";
-        const url = editingExpense ? `/api/expenses/expense/${editingExpense._id}` : "/api/expenses/expense";
-        const response = await fetch(url, {
-            method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...data, userId: session?.user?.id, _id: editingExpense?._id }),
-        });
-        if (response.ok) {
-            await fetchExpenses();
-            setEditingExpense(null);
-            setIsExpenseModalOpen(false);
-            toast.success(editingExpense ? "😊 Expense Updated" : "😊 Expense Created", {
-                description: `The expense "${data.description}" has been ${editingExpense ? "updated" : "created"} successfully.`,
-            });
-        } else {
-            const errorData = await response.json();
-            toast.error("Error", { description: errorData.error });
-        }
-    };
+  const filteredExpenses = React.useMemo(() => {
+    let result = [...expenses];
+    if (expenseCategoryFilter !== "all") {
+      result = result.filter((expense) => {
+        const categoryId = typeof expense.category === "string" ? expense.category : expense.category?._id;
+        return categoryId === expenseCategoryFilter;
+      });
+    }
+    if (expenseTypeFilter !== "all") {
+      result = result.filter((expense) => expense.type === expenseTypeFilter);
+    }
+    if (expenseStatusFilter !== "all") {
+      result = result.filter((expense) => expense.status === expenseStatusFilter);
+    }
+    result.sort((a, b) => {
+      const multiplier = expenseSortOrder === "asc" ? 1 : -1;
+      if (expenseSortBy === "description") return multiplier * a.description.localeCompare(b.description);
+      if (expenseSortBy === "amount") return multiplier * (a.amount - b.amount);
+      return multiplier * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    });
+    return result;
+  }, [expenses, expenseCategoryFilter, expenseTypeFilter, expenseStatusFilter, expenseSortBy, expenseSortOrder]);
 
-    const handleDeleteExpense = async (id: string) => {
-        const response = await fetch(`/api/expenses/expense?_id=${id}&userId=${session?.user?.id}`, {
-            method: "DELETE",
-        });
-        if (response.ok) {
-            await fetchExpenses();
-            toast.success("😊 Expense Deleted", { description: "😊 The expense has been successfully removed." });
-        } else {
-            const errorData = await response.json();
-            toast.error("Error", { description: errorData.error });
-        }
-    };
-
-    const handleEditExpense = (expense: Expense) => {
-        setEditingExpense(expense);
-        setIsExpenseModalOpen(true);
-    };
-
-    const handleCancelEditExpense = () => {
-        setEditingExpense(null);
-        setIsExpenseModalOpen(false);
-    };
-
-    const filteredExpenses = React.useMemo(() => {
-        let result = [...expenses];
-        if (expenseCategoryFilter !== "all") {
-            result = result.filter((expense) => {
-                const categoryId = typeof expense.category === "string"
-                    ? expense.category
-                    : (expense.category as { _id: string })?._id;
-                return categoryId === expenseCategoryFilter;
-            });
-        }
-        if (expenseTypeFilter !== "all") {
-            result = result.filter((expense) => expense.type === expenseTypeFilter);
-        }
-        if (expenseStatusFilter !== "all") {
-            result = result.filter((expense) => expense.status === expenseStatusFilter);
-        }
-        result.sort((a, b) => {
-            const multiplier = expenseSortOrder === "asc" ? 1 : -1;
-            if (expenseSortBy === "description") return multiplier * a.description.localeCompare(b.description);
-            if (expenseSortBy === "amount") return multiplier * (a.amount - b.amount);
-            return multiplier * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-        });
-        return result;
-    }, [expenses, expenseCategoryFilter, expenseTypeFilter, expenseStatusFilter, expenseSortBy, expenseSortOrder]);
-    
   const transformExpenseToInitialData = (expense: Expense) => ({
     description: expense.description,
     amount: expense.amount,
-    category: typeof expense.category === 'string' ? expense.category : expense.category._id,
-    paymentMode: typeof expense.paymentMode === 'string' ? expense.paymentMode : expense.paymentMode._id,
+    category: typeof expense.category === "string" ? expense.category : expense.category._id,
+    paymentMode: typeof expense.paymentMode === "string" ? expense.paymentMode : expense.paymentMode._id,
     type: expense.type,
     status: expense.status,
   });
 
   if (status === "loading") {
-      return <Loading name={"Expenses"} />;
+    return <Loading name={"Expenses"} />;
   }
 
   return (

@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/popover";
 import { Edit, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 
 export interface Todo {
   _id: string;
@@ -79,10 +78,10 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                   </TableCell>
                   <TableCell>{truncateText(todo.description, 20)}</TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {format(new Date(todo.createdAt), "PPp")}
+                    {(new Date(todo.createdAt).toLocaleString())}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
-                    {format(new Date(todo.updatedAt), "PPp")}
+                    {(new Date(todo.updatedAt).toLocaleString())}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1 md:gap-2">
@@ -126,10 +125,10 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                     />
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Created:</strong> {format(new Date(todo.createdAt), "PPp")}
+                    <strong>Created:</strong> {(new Date(todo.createdAt).toLocaleString())}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    <strong>Updated:</strong> {format(new Date(todo.updatedAt), "PPp")}
+                    <strong>Updated:</strong> {(new Date(todo.updatedAt).toLocaleString())}
                   </p>
                   <div className="flex gap-2 mt-4">
                     <Button
@@ -150,6 +149,7 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
                     </Button>
                   </div>
                 </div>
+
               </PopoverContent>
             </Popover>
           ))}

@@ -66,7 +66,7 @@ export function ExpenseTable({
                 <TableCell>{(typeof(expense.paymentMode)==="object"&&expense.paymentMode?.name)||getPaymentModeName(expense)}</TableCell>
                 <TableCell>{expense.type}</TableCell>
                 <TableCell>{expense.status}</TableCell>
-                <TableCell>{new Date(expense.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(expense.createdAt).toLocaleString()}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button variant="ghost" size="sm" onClick={() => onEdit(expense)}>

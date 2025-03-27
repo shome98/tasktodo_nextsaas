@@ -61,7 +61,7 @@ export function ExpenseTable({
             expenses.map((expense) => (
               <TableRow key={expense._id}>
                 <TableCell>{expense.description}</TableCell>
-                <TableCell>${expense.amount.toFixed(2)}</TableCell>
+                <TableCell>₹ {expense.amount.toFixed(2)}</TableCell>
                 <TableCell>{(typeof(expense.category)==="object"&&expense.category?.name)||getCategoryName(expense)}</TableCell>
                 <TableCell>{(typeof(expense.paymentMode)==="object"&&expense.paymentMode?.name)||getPaymentModeName(expense)}</TableCell>
                 <TableCell>{expense.type}</TableCell>

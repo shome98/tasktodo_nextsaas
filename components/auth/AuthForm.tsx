@@ -1,150 +1,107 @@
 "use client";
 
-import * as React from "react";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import {Form,FormControl,FormField,FormItem,FormLabel,FormMessage,} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FormEvent } from "react";
+import { Loader2 } from "lucide-react";
 
 interface AuthFormProps {
-  type: "login" | "signup";
-}
-
-interface FormData {
+  title: string;
+  onSubmit: (event: FormEvent) => Promise<void>;
+  onGoogleAuth: () => Promise<void>;
   email: string;
+  setEmail: (value: string) => void;
   password: string;
+  setPassword: (value: string) => void;
+  submitText: string;
+  googleText: string;
+  loading?: boolean;
+  message?: string | null;
+  footerText: string;
+  footerLinkText: string;
+  onFooterLinkClick: () => void;
 }
 
-export function AuthForm({ type }: AuthFormProps) {
-  const router = useRouter();
-  const form = useForm<FormData>({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const onSubmit = async (data: FormData) => {
-    try {
-      if (type === "login") {
-        const result = await signIn("credentials", {
-          redirect: false,
-          email: data.email,
-          password: data.password,
-        });
-
-        if (result?.error) {
-          toast.error("Error", {
-            description: result.error,
-          });
-          return;
-        }
-        router.push("/");
-      } else {
-        const res = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-
-        if (!res.ok) {
-          toast.error("Error", {
-            description: result.error,
-          });
-          return;
-        }
-
-        toast.success("Success", {
-          description: "Account created successfully! Please log in.",
-        });
-        router.push("/login");
-      }
-    } catch (error) {
-        console.error(error);
-      toast.error("Error", {
-        description: "😢Something went wrong. Please try again.",
-      });
-    }
-  };
-
+export default function AuthForm({
+  title,
+  onSubmit,
+  onGoogleAuth,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  submitText,
+  googleText,
+  loading = false,
+  message,
+  footerText,
+  footerLinkText,
+  onFooterLinkClick,
+}: AuthFormProps) {
   return (
-    <div className="w-full max-w-md px-4 animate-in fade-in duration-700">
-      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-center">
-        {type === "login" ? "Welcome Back" : "Create Account"}
-      </h2>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your email"
-                    type="email"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your password"
-                    type="password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="submit"
-            className="w-full transition-all duration-300 hover:scale-105 text-sm md:text-base"
-          >
-            {type === "login" ? "Log In" : "Sign Up"}
-          </Button>
-        </form>
-      </Form>
-      <p className="mt-3 md:mt-4 text-center text-xs md:text-sm text-muted-foreground">
-        {type === "login" ? (
-          <>
-            Don&apos;t have an account?{" "}
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <Card className="w-full max-w-md shadow-lg transition-all duration-300 hover:shadow-xl">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-center text-gray-300">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              className="w-full transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              className="w-full transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
             <Button
-              variant="link"
-              onClick={() => router.push("/signup")}
-              className="p-0 h-auto text-xs md:text-sm"
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 transition-all duration-200"
+              disabled={loading}
             >
-              Sign up
+              {loading ? <Loader2 className="w-12 h-12 animate-spin text-primary" /> : submitText}
             </Button>
-          </>
-        ) : (
-          <>
-            Already have an account?{" "}
             <Button
-              variant="link"
-              onClick={() => router.push("/login")}
-              className="p-0 h-auto text-xs md:text-sm"
+              type="button"
+              variant="outline"
+              className="w-full border-red-500 text-red-500 hover:bg-red-50 transition-all duration-200"
+              onClick={onGoogleAuth}
+              disabled={loading}
             >
-              Log in
+              {googleText}
             </Button>
-          </>
-        )}
-      </p>
+          </form>
+          {message && (
+            <p
+              className={`mt-4 text-center font-semibold ${
+                message.startsWith("✅") ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {message}
+            </p>
+          )}
+          <p className="mt-4 text-center text-gray-500">
+            {footerText}{" "}
+            <button
+              onClick={onFooterLinkClick}
+              className="text-blue-500 hover:underline focus:outline-none transition-all duration-200"
+            >
+              {footerLinkText}
+            </button>
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

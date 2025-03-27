@@ -13,7 +13,7 @@ const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     "rules":{
-      "no-unsued-vars":["error",{"varsIgnorePattern":"^Category$|^PaymentMode$"}]
+      "no-unused-vars":["error",{"varsIgnorePattern":"^Category$|^PaymentMode$"}]
     }
   }
 ];

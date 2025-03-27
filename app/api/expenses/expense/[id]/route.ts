@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import Expense from "@/models/expenses/expense.model";
@@ -6,7 +7,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import PaymentMode from "@/models/expenses/paymentmode.model";
 import Category from "@/models/expenses/category.model";
 
-const ensuremodels=[Category,PaymentMode];
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
     try {

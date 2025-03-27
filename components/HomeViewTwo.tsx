@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-//@ts-nocheck
 "use client";
 
 import * as React from "react";
@@ -212,27 +210,7 @@ export default function HomeViewTwo() {
     setIsPaymentModeModalOpen(false);
   };
 
-//   const filteredExpenses = React.useMemo(() => {
-//     let result = [...expenses];
-//     if (expenseCategoryFilter !== "all") {
-//       result = result.filter((expense) => expense.category === expenseCategoryFilter);
-//     }
-//     if (expenseTypeFilter !== "all") {
-//       result = result.filter((expense) => expense.type === expenseTypeFilter);
-//     }
-//     if (expenseStatusFilter !== "all") {
-//       result = result.filter((expense) => expense.status === expenseStatusFilter);
-//     }
-//     result.sort((a, b) => {
-//       const multiplier = expenseSortOrder === "asc" ? 1 : -1;
-//       if (expenseSortBy === "description") return multiplier * a.description.localeCompare(b.description);
-//       if (expenseSortBy === "amount") return multiplier * (a.amount - b.amount);
-//       return multiplier * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-//     });
-//     return result;
-    //   }, [expenses, expenseCategoryFilter, expenseTypeFilter, expenseStatusFilter, expenseSortBy, expenseSortOrder]);
-    
-    const filteredExpenses = React.useMemo(() => {
+  const filteredExpenses = React.useMemo(() => {
   let result = [...expenses];
   if (expenseCategoryFilter !== "all") {
     result = result.filter((expense) => {
@@ -261,6 +239,15 @@ export default function HomeViewTwo() {
   //const flatCategories = React.useMemo(() => categories.map((cat) => cat.name), [categories]);
   //const flatPaymentModes = React.useMemo(() => paymentModes.map((pm) => pm.name), [paymentModes]);
 
+  const transformExpenseToInitialData = (expense: Expense) => ({
+    description: expense.description,
+    amount: expense.amount,
+    category: typeof expense.category === 'string' ? expense.category : expense.category._id,
+    paymentMode: typeof expense.paymentMode === 'string' ? expense.paymentMode : expense.paymentMode._id,
+    type: expense.type,
+    status: expense.status,
+  });
+
   if (status === "loading") {
     return <div className="text-center mt-20">Loading...</div>;
   }
@@ -277,7 +264,7 @@ export default function HomeViewTwo() {
         <div className="mb-8 flex justify-end">
           <ExpenseModalForm
             onSubmit={handleCreateOrUpdateExpense}
-            initialData={editingExpense||undefined}
+            initialData={editingExpense ? transformExpenseToInitialData(editingExpense) : undefined}
             onCancel={handleCancelEditExpense}
             isOpen={isExpenseModalOpen}
             setIsOpen={setIsExpenseModalOpen}

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "devon":"next dev",
+    "devon": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -21,7 +21,6 @@
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
     "lucide-react": "^0.483.0",
     "mongoose": "^8.12.2",
     "next": "15.2.3",

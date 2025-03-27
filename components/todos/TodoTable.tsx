@@ -157,7 +157,7 @@ export function TodoTable({ todos, onToggle, onDelete, onEdit }: TodoTableProps)
       </Table>
       {todos.length === 0 && (
         <div className="text-center py-4 text-muted-foreground text-sm">
-          No tasks found matching your filters.
+          😵 No tasks found. Please add one to continue.
         </div>
       )}
     </div>

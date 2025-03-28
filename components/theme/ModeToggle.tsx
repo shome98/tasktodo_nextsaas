@@ -7,13 +7,10 @@ import { ReactNode } from "react";
 
 export default function ModeToggle():ReactNode {
     const { setTheme, theme } = useTheme();
-    return
-    <Button
-            
+    return <Button
             size="icon"
             className="relative overflow-hidden"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        >
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
             <Sun className={cn(
                 "h-5 w-5 transition-all duration-300",
                 theme === "dark" ? "-rotate-90 scale-0" : "rotate-0 scale-100"

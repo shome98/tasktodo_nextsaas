@@ -74,7 +74,7 @@ const CategoryViewv1 = () => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-6 px-4 md:py-8 pt-24">
+    <div className="w-full max-w-6xl mx-auto py-6 px-4 md:py-8">
       <section className="mb-12">
         <h2 className="text-xl md:text-2xl font-semibold mb-4 text-center">Categories</h2>
         <div className="mb-8 flex justify-end">

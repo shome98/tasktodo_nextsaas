@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-// import { ModeToggle } from "@/components/mode-toggle";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LogOut, Menu } from "lucide-react";
@@ -11,18 +10,20 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+//import ModeToggle from "../theme/ModeToggle";
 
 export function NavBar() {
   const { status } = useSession();
   const router = useRouter();
 
   const handleLogout = async () => {
+    localStorage.clear();
     await signOut({ redirect: false });
     router.push("/login");
   };
 
   return (
-    <header className="h-15 fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+    <header className="h-15 fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b mb-12">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <h1
           className="text-xl md:text-2xl font-bold cursor-pointer"
@@ -57,7 +58,7 @@ export function NavBar() {
               </Button>
             </>
           )}
-          {/* <ModeToggle /> */}
+           {/* <ModeToggle />  */}
         </div>
         <Sheet>
           <SheetTrigger asChild className="md:hidden">

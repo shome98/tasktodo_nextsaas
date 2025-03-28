@@ -34,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${nunitoSans.variable} antialiased`}
       ><NavBar/>
-          {children}
+          <main className="pt-16">
+  {children}
+</main>
           <Toaster />
           <Footer/>
       </body>

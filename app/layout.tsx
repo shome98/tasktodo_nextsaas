@@ -33,12 +33,12 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body
         className={`${montserrat.variable} ${nunitoSans.variable} antialiased`}
-      ><NavBar/>
-          <main className="pt-16">
-  {children}
-</main>
+      ><div className="flex flex-col min-h-screen">
+    <NavBar />
+    <main className="flex-1 pt-17">{children}</main>
+    <Footer />
+  </div>
           <Toaster />
-          <Footer/>
       </body>
       </html>
       </AuthProvider>

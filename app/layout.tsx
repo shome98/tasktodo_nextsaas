@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/AuthProvider";
 import { Toaster } from "sonner";
 import { NavBar } from "@/components/nav/NavBar";
+import Footer from "@/components/Footer";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
       ><NavBar/>
           {children}
           <Toaster />
+          <Footer/>
       </body>
       </html>
       </AuthProvider>

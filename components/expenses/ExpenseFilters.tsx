@@ -3,7 +3,9 @@ import * as React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Category } from "@/types/requiredtypes";
-import { Filter } from "lucide-react";
+import { Filter, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface ExpenseFiltersProps {
   categoryFilter: string;
@@ -34,11 +36,107 @@ export function ExpenseFilters({
 }: ExpenseFiltersProps) {
   return (
     <div className="max-w-full w-full mx-auto px-4">
-      <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-5 gap-4 mb-4">
+
+      {/* 📱 Small Screens: Dropdown Menu */}
+      <div className="sm:hidden mb-4">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="w-full flex items-center justify-between">
+              Filter Options <ChevronDown className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full">
+            <div className="flex flex-col gap-3">
+              
+              {/* Category Filter */}
+              <div className="flex flex-col">
+                <Label htmlFor="categoryFilter">Category</Label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger id="categoryFilter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat._id} value={cat._id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Type Filter */}
+              <div className="flex flex-col">
+                <Label htmlFor="typeFilter">Type</Label>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger id="typeFilter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="credit">Credit</SelectItem>
+                    <SelectItem value="debit">Debit</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Status Filter */}
+              <div className="flex flex-col">
+                <Label htmlFor="statusFilter">Status</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger id="statusFilter">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="due">Due</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="refunded">Refunded</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort By Filter */}
+              <div className="flex flex-col">
+                <Label htmlFor="sortBy">Sort By</Label>
+                <Select value={sortBy} onValueChange={(value) => setSortBy(value as "createdAt" | "amount" | "description")}>
+                  <SelectTrigger id="sortBy">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="createdAt">Date</SelectItem>
+                    <SelectItem value="amount">Amount</SelectItem>
+                    <SelectItem value="description">Description</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Order Filter */}
+              <div className="flex flex-col">
+                <Label htmlFor="sortOrder">Sort Order</Label>
+                <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "asc" | "desc")}>
+                  <SelectTrigger id="sortOrder">
+                    <SelectValue placeholder="Order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* 🖥️ Large Screens: Grid Layout */}
+      <div className="hidden sm:grid sm:grid-cols-5 gap-4">
+        
+        {/* Category Filter */}
         <div className="flex flex-col">
-          <Label htmlFor="categoryFilter" className="mb-1 flex items-center gap-1">
-            <Filter className="h-4 w-4 shrink-0" /> Category
-          </Label>
+          <Label htmlFor="categoryFilter">Category</Label>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger id="categoryFilter">
               <SelectValue placeholder="All" />
@@ -54,10 +152,9 @@ export function ExpenseFilters({
           </Select>
         </div>
 
+        {/* Type Filter */}
         <div className="flex flex-col">
-          <Label htmlFor="typeFilter" className="mb-1 flex items-center gap-1">
-            <Filter className="h-4 w-4 shrink-0" /> Type
-          </Label>
+          <Label htmlFor="typeFilter">Type</Label>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger id="typeFilter">
               <SelectValue placeholder="All" />
@@ -70,10 +167,9 @@ export function ExpenseFilters({
           </Select>
         </div>
 
+        {/* Status Filter */}
         <div className="flex flex-col">
-          <Label htmlFor="statusFilter" className="mb-1 flex items-center gap-1">
-            <Filter className="h-4 w-4 shrink-0" /> Status
-          </Label>
+          <Label htmlFor="statusFilter">Status</Label>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger id="statusFilter">
               <SelectValue placeholder="All" />
@@ -87,8 +183,9 @@ export function ExpenseFilters({
           </Select>
         </div>
 
+        {/* Sort By Filter */}
         <div className="flex flex-col">
-          <Label htmlFor="sortBy" className="mb-1">Sort By</Label>
+          <Label htmlFor="sortBy">Sort By</Label>
           <Select value={sortBy} onValueChange={(value) => setSortBy(value as "createdAt" | "amount" | "description")}>
             <SelectTrigger id="sortBy">
               <SelectValue placeholder="Sort by" />
@@ -96,16 +193,14 @@ export function ExpenseFilters({
             <SelectContent>
               <SelectItem value="createdAt">Date</SelectItem>
               <SelectItem value="amount">Amount</SelectItem>
-              <SelectItem value="description">
-                <span className="sm:inline hidden">Description</span>
-                <span className="inline sm:hidden">Desc...</span>
-              </SelectItem>
+              <SelectItem value="description">Description</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
+        {/* Sort Order Filter */}
         <div className="flex flex-col">
-          <Label htmlFor="sortOrder" className="mb-1">Sort Order</Label>
+          <Label htmlFor="sortOrder">Sort Order</Label>
           <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as "asc" | "desc")}>
             <SelectTrigger id="sortOrder">
               <SelectValue placeholder="Order" />
@@ -116,6 +211,7 @@ export function ExpenseFilters({
             </SelectContent>
           </Select>
         </div>
+
       </div>
     </div>
   );

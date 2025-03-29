@@ -1,77 +1,73 @@
+// components/views/TodoViewv1.tsx
 "use client";
-import { Todo } from "@/types/requiredtypes";
 import React from "react";
 import { toast } from "sonner";
+import { Todo } from "@/types/requiredtypes";
 import { TodoModalForm } from "../todos/TodoModalForm";
 import { TodoTable } from "../todos/TodoTable";
 import { TodoFilters } from "../todos/TodoFilters";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Loading from "../Loading";
-import { fetchTodos, createOrUpdateTodo, deleteTodo, toggleTodo } from "@/lib/server/todo.actions";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
+import {
+  fetchTodosThunk,
+  createOrUpdateTodoThunk,
+  deleteTodoThunk,
+  toggleTodoThunk
+} from '@/lib/redux/slices/todoSlice';
 
 const TodoViewv1 = () => {
-  const [todos, setTodos] = React.useState<Todo[]>([]);
+  const { status, data: session } = useSession();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { items: todos, loading } = useAppSelector((state) => state.todos);
+
   const [editingTodo, setEditingTodo] = React.useState<Todo | null>(null);
   const [isTodoModalOpen, setIsTodoModalOpen] = React.useState<boolean>(false);
   const [todoStatusFilter, setTodoStatusFilter] = React.useState<"all" | "completed" | "pending">("all");
   const [todoSortBy, setTodoSortBy] = React.useState<"created" | "updated" | "title">("created");
   const [todoSortOrder, setTodoSortOrder] = React.useState<"asc" | "desc">("desc");
 
-  const { status, data: session } = useSession();
-  const router = useRouter();
-
   React.useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
     if (status === "authenticated" && session?.user?.id) {
-      fetchTodos()
-        .then(setTodos)
-        .catch((error) => {
-          const message = error instanceof Error ? error.message : "Unknown error from todos.";
-          toast.error("Error", { description: `😵 ${message}` });
-        });
+      dispatch(fetchTodosThunk()).catch((error) => {
+        toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error from todos"}` });
+      });
     }
-  }, [status, session, router]);
+  }, [status, session, router, dispatch]);
 
   const handleCreateOrUpdate = async (data: { title: string; description: string }) => {
     try {
-      await createOrUpdateTodo({ ...data, _id: editingTodo?._id });
-      const updatedTodos = await fetchTodos();
-      setTodos(updatedTodos);
+      await dispatch(createOrUpdateTodoThunk({ ...data, _id: editingTodo?._id })).unwrap();
       setEditingTodo(null);
       setIsTodoModalOpen(false);
       toast.success(editingTodo ? "😊 Task Updated" : "😊 Task Created", {
         description: `The task "${data.title}" has been ${editingTodo ? "updated" : "created"} successfully.`,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: `😵 ${message}` });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
   const handleDeleteTodo = async (id: string) => {
     try {
-      await deleteTodo(id);
-      const updatedTodos = await fetchTodos();
-      setTodos(updatedTodos);
+      await dispatch(deleteTodoThunk(id)).unwrap();
       toast.success("Task Deleted", { description: "The task has been successfully removed." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: message });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
   const handleToggleTodo = async (id: string, completed: boolean) => {
     try {
-      await toggleTodo(id, completed);
-      const updatedTodos = await fetchTodos();
-      setTodos(updatedTodos);
+      await dispatch(toggleTodoThunk({ id, completed })).unwrap();
       toast.success("Success", { description: "😊 Successfully toggled the todo." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: `😵 ${message}` });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
@@ -101,7 +97,7 @@ const TodoViewv1 = () => {
     return result;
   }, [todos, todoStatusFilter, todoSortBy, todoSortOrder]);
 
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return <Loading name={"Todos"} />;
   }
 

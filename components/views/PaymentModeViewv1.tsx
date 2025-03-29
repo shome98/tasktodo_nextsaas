@@ -1,18 +1,26 @@
+// components/views/PaymentModeViewv1.tsx
 "use client";
-import { PaymentMode } from "@/types/requiredtypes";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
+import { PaymentMode } from "@/types/requiredtypes";
 import { PaymentModeTable } from "../paymentmode/PaymentModeTable";
 import { PaymentModeModalForm } from "../paymentmode/PaymentModeModalForm";
 import Loading from "../Loading";
-import { fetchPaymentModes, createOrUpdatePaymentMode, deletePaymentMode } from "@/lib/server/paymentmode.actions";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
+import {
+  fetchPaymentModesThunk,
+  createOrUpdatePaymentModeThunk,
+  deletePaymentModeThunk
+} from '@/lib/redux/slices/paymentModeSlice';
 
 const PaymentModeViewv1 = () => {
   const { status, data: session } = useSession();
   const router = useRouter();
-  const [paymentModes, setPaymentModes] = React.useState<PaymentMode[]>([]);
+  const dispatch = useAppDispatch();
+  const { items: paymentModes, loading } = useAppSelector((state) => state.paymentModes);
+
   const [editingPaymentMode, setEditingPaymentMode] = React.useState<PaymentMode | null>(null);
   const [isPaymentModeModalOpen, setIsPaymentModeModalOpen] = React.useState(false);
 
@@ -21,40 +29,31 @@ const PaymentModeViewv1 = () => {
       router.push("/login");
     }
     if (status === "authenticated" && session?.user?.id) {
-      fetchPaymentModes()
-        .then(setPaymentModes)
-        .catch((error) => {
-          const message = error instanceof Error ? error.message : "Unknown error from payment modes.";
-          toast.error("Error", { description: `😵 ${message}` });
-        });
+      dispatch(fetchPaymentModesThunk()).catch((error) => {
+        toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error from payment modes"}` });
+      });
     }
-  }, [status, session, router]);
+  }, [status, session, router, dispatch]);
 
   const handleCreateOrUpdatePaymentMode = async (data: { name: string }) => {
     try {
-      await createOrUpdatePaymentMode({ ...data, _id: editingPaymentMode?._id });
-      const updatedPaymentModes = await fetchPaymentModes();
-      setPaymentModes(updatedPaymentModes);
+      await dispatch(createOrUpdatePaymentModeThunk({ ...data, _id: editingPaymentMode?._id })).unwrap();
       setEditingPaymentMode(null);
       setIsPaymentModeModalOpen(false);
       toast.success(editingPaymentMode ? "😊 Payment Mode Updated" : "😊 Payment Mode Created", {
         description: `The payment mode has been ${editingPaymentMode ? "updated" : "created"} successfully.`,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: `😵 ${message}` });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
   const handleDeletePaymentMode = async (id: string) => {
     try {
-      await deletePaymentMode(id);
-      const updatedPaymentModes = await fetchPaymentModes();
-      setPaymentModes(updatedPaymentModes);
+      await dispatch(deletePaymentModeThunk(id)).unwrap();
       toast.success("😊 Payment Mode Deleted", { description: "😊 The payment mode has been successfully removed." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: `😵 ${message}` });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
@@ -68,7 +67,7 @@ const PaymentModeViewv1 = () => {
     setIsPaymentModeModalOpen(false);
   };
 
-  if (status === "loading") {
+  if (status === "loading" || loading) {
     return <Loading name={"Payment Modes"} />;
   }
 

@@ -1,3 +1,4 @@
+// components/views/ExpenseViewv1.tsx
 "use client";
 import * as React from "react";
 import { useSession } from "next-auth/react";
@@ -8,15 +9,24 @@ import { ExpenseModalForm } from "../expenses/ExpenseModalForm";
 import { ExpenseFilters } from "../expenses/ExpenseFilters";
 import { ExpenseTable } from "../expenses/ExpenseTable";
 import Loading from "../Loading";
-import { fetchExpenses, createOrUpdateExpense, deleteExpense } from "@/lib/server/expense.actions";
-import { fetchCategories } from "@/lib/server/category.actions";
-import { fetchPaymentModes } from "@/lib/server/paymentmode.actions";
+import { useAppDispatch, useAppSelector } from '@/lib/redux/store';
+import {
+  fetchExpensesThunk,
+  createOrUpdateExpenseThunk,
+  deleteExpenseThunk
+} from '@/lib/redux/slices/expenseSlice';
+import { fetchCategoriesThunk } from '@/lib/redux/slices/categorySlice';
+import { fetchPaymentModesThunk } from '@/lib/redux/slices/paymentModeSlice';
 
 export default function ExpenseViewv1() {
   const { status, data: session } = useSession();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  
+  const { items: expenses, loading: expenseLoading } = useAppSelector((state) => state.expenses);
+  const { items: categories, loading: categoryLoading } = useAppSelector((state) => state.categories);
+  const { items: paymentModes, loading: paymentModeLoading } = useAppSelector((state) => state.paymentModes);
 
-  const [expenses, setExpenses] = React.useState<Expense[]>([]);
   const [editingExpense, setEditingExpense] = React.useState<Expense | null>(null);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = React.useState(false);
   const [expenseCategoryFilter, setExpenseCategoryFilter] = React.useState<string>("all");
@@ -24,8 +34,6 @@ export default function ExpenseViewv1() {
   const [expenseStatusFilter, setExpenseStatusFilter] = React.useState<string>("all");
   const [expenseSortBy, setExpenseSortBy] = React.useState<"createdAt" | "amount" | "description">("createdAt");
   const [expenseSortOrder, setExpenseSortOrder] = React.useState<"asc" | "desc">("desc");
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [paymentModes, setPaymentModes] = React.useState<PaymentMode[]>([]);
 
   React.useEffect(() => {
     if (status === "unauthenticated") {
@@ -33,15 +41,14 @@ export default function ExpenseViewv1() {
     }
     if (status === "authenticated" && session?.user?.id) {
       Promise.all([
-        fetchExpenses().then(setExpenses),
-        fetchCategories().then(setCategories),
-        fetchPaymentModes().then(setPaymentModes),
+        dispatch(fetchExpensesThunk()),
+        dispatch(fetchCategoriesThunk()),
+        dispatch(fetchPaymentModesThunk())
       ]).catch((error) => {
-        const message = error instanceof Error ? error.message : "Unknown error from expenses.";
-        toast.error("Error", { description: `😵 ${message}` });
+        toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error from expenses"}` });
       });
     }
-  }, [status, session, router]);
+  }, [status, session, router, dispatch]);
 
   const handleCreateOrUpdateExpense = async (data: {
     description: string;
@@ -52,29 +59,23 @@ export default function ExpenseViewv1() {
     status: "due" | "paid" | "refunded";
   }) => {
     try {
-      await createOrUpdateExpense({ ...data, _id: editingExpense?._id });
-      const updatedExpenses = await fetchExpenses();
-      setExpenses(updatedExpenses);
+      await dispatch(createOrUpdateExpenseThunk({ ...data, _id: editingExpense?._id })).unwrap();
       setEditingExpense(null);
       setIsExpenseModalOpen(false);
       toast.success(editingExpense ? "😊 Expense Updated" : "😊 Expense Created", {
         description: `The expense "${data.description}" has been ${editingExpense ? "updated" : "created"} successfully.`,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: message });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
   const handleDeleteExpense = async (id: string) => {
     try {
-      await deleteExpense(id);
-      const updatedExpenses = await fetchExpenses();
-      setExpenses(updatedExpenses);
+      await dispatch(deleteExpenseThunk(id)).unwrap();
       toast.success("😊 Expense Deleted", { description: "😊 The expense has been successfully removed." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error";
-      toast.error("Error", { description: message });
+      toast.error("Error", { description: `😵 ${(error as Error).message || "Unknown error"}` });
     }
   };
 
@@ -92,7 +93,7 @@ export default function ExpenseViewv1() {
     let result = [...expenses];
     if (expenseCategoryFilter !== "all") {
       result = result.filter((expense) => {
-        const categoryId = typeof expense.category === "string" ? expense.category : expense.category?._id;
+        const categoryId = typeof expense.category === "string" ? expense.category : expense.category._id;
         return categoryId === expenseCategoryFilter;
       });
     }
@@ -120,7 +121,7 @@ export default function ExpenseViewv1() {
     status: expense.status,
   });
 
-  if (status === "loading") {
+  if (status === "loading" || expenseLoading || categoryLoading || paymentModeLoading) {
     return <Loading name={"Expenses"} />;
   }
 

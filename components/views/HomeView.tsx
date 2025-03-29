@@ -36,7 +36,7 @@ export default function HomeView() {
       {/* Tabs Navigation */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="overflow-x-auto scrollbar-hide">
-          <TabsList className="flex justify-center gap-2 md:gap-4 bg-transparent max-w-full mx-auto overflow-x-auto">
+          <TabsList className="flex justify-start md:justify-center gap-2 md:gap-4 bg-transparent max-w-full mx-auto px-2">
             {[
               { value: "overview", label: "Overview" },
               { value: "todos", label: "Todos" },

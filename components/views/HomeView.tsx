@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,11 +20,11 @@ export default function HomeView() {
   });
 
   useEffect(() => {
-      localStorage.setItem("activeTab", activeTab);
+    localStorage.setItem("activeTab", activeTab);
   }, [activeTab]);
 
   if (status === "loading") {
-    return <Loading />;
+    return <Loading name={activeTab === "overview" ? "Dashboard" : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} />;
   }
 
   return (
